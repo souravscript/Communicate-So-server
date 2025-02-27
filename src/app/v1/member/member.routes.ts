@@ -6,8 +6,8 @@ import {
   //updateCategories, 
   //updateRole 
 } from './member.controller';
-import { isAuthenticated } from '../../middlewares/authValidate';
-import { isAdmin } from '../../middlewares/adminCheck';
+import { isAuthenticated } from '../../../middlewares/authValidate';
+import { isAdmin } from '../../../middlewares/adminCheck';
 
 const router = Router();
 

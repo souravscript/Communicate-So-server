@@ -31,6 +31,10 @@ export const isAuthenticated = async (
     const accessToken = req.cookies?.access_token;
     const refreshToken = req.cookies?.refresh_token;
 
+    console.log('Cookies:', req.cookies);  
+    console.log('Access token:', accessToken);
+    console.log('Refresh token:', refreshToken);
+
     if (!accessToken && !refreshToken) {
       return res.status(401).json({ message: 'Unauthorized: No token provided' });
     }
@@ -38,6 +42,8 @@ export const isAuthenticated = async (
     try {
       // First try to verify the access token
       const { data: { user }, error } = await supabase.auth.getUser(accessToken);
+
+      console.log('Supabase user:', user);
       
       if (user) {
         // Find user in our database using supabaseId

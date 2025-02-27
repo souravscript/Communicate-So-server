@@ -1,33 +1,46 @@
-import { prisma } from '../../utils/prisma';
+import { prisma } from '../../../utils/prisma';
 
 interface CreateQueryInput {
   content: string;
-  platform: string;
   response?: string;
   metadata?: Record<string, any>;
+  categoryName: string;
 }
 
 interface QueryStats {
   total: number;
-  byPlatform: Record<string, number>;
+  byContent: Record<string, number>;
+  byCategory: Record<string, number>;
 }
 
 export const createQuery = async (input: CreateQueryInput, userId: string) => {
   try {
+    const category = await prisma.category.findFirst({
+      where: {
+        name: input.categoryName,
+        userIds: {
+          has: userId
+        }
+      }
+    });
+
+    if (!category) {
+      throw new Error('Category not found or access denied');
+    }
+
     const query = await prisma.query.create({
       data: {
         content: input.content,
-        platform: input.platform,
         response: input.response,
         metadata: input.metadata || {},
-        createdBy: userId
+        createdBy: userId,
+        categoryId: category.id
       },
       include: {
-        user: {
+        category: {
           select: {
             id: true,
-            name: true,
-            email: true
+            name: true
           }
         }
       }
@@ -47,11 +60,10 @@ export const getQueries = async (userId: string) => {
         createdBy: userId
       },
       include: {
-        user: {
+        category: {
           select: {
             id: true,
-            name: true,
-            email: true
+            name: true
           }
         }
       },
@@ -67,16 +79,16 @@ export const getQueries = async (userId: string) => {
 
 export const getQueryById = async (queryId: string, userId: string) => {
   try {
-    const query = await prisma.query.findUnique({
+    const query = await prisma.query.findFirst({
       where: {
-        id: queryId
+        id: queryId,
+        createdBy: userId
       },
       include: {
-        user: {
+        category: {
           select: {
             id: true,
-            name: true,
-            email: true
+            name: true
           }
         }
       }
@@ -84,11 +96,6 @@ export const getQueryById = async (queryId: string, userId: string) => {
 
     if (!query) {
       throw new Error('Query not found');
-    }
-
-    // Only allow access to own queries
-    if (query.createdBy !== userId) {
-      throw new Error('Unauthorized access to query');
     }
 
     return query;
@@ -100,13 +107,11 @@ export const getQueryById = async (queryId: string, userId: string) => {
 
 export const getThisWeekStats = async (userId: string): Promise<QueryStats> => {
   try {
-    // Get the start of the current week (Sunday)
     const now = new Date();
     const startOfWeek = new Date(now);
     startOfWeek.setDate(now.getDate() - now.getDay());
     startOfWeek.setHours(0, 0, 0, 0);
 
-    // Get queries for this week
     const queries = await prisma.query.findMany({
       where: {
         createdBy: userId,
@@ -115,20 +120,30 @@ export const getThisWeekStats = async (userId: string): Promise<QueryStats> => {
           lte: now
         }
       },
-      select: {
-        platform: true
+      include: {
+        category: {
+          select: {
+            name: true
+          }
+        }
       }
     });
 
-    // Calculate statistics
-    const byPlatform: Record<string, number> = {};
+    const byContent: Record<string, number> = {};
+    const byCategory: Record<string, number> = {};
+
     queries.forEach(query => {
-      byPlatform[query.platform] = (byPlatform[query.platform] || 0) + 1;
+      const contentKey = query.content.substring(0, 50);
+      byContent[contentKey] = (byContent[contentKey] || 0) + 1;
+
+      const categoryName = query.category.name;
+      byCategory[categoryName] = (byCategory[categoryName] || 0) + 1;
     });
 
     return {
       total: queries.length,
-      byPlatform
+      byContent,
+      byCategory
     };
   } catch (error) {
     console.error('Error in getThisWeekStats:', error);

@@ -3,18 +3,18 @@ import { createQuery, getQueries, getQueryById, getThisWeekStats } from './queri
 
 export const createQueryHandler = async (req: Request, res: Response) => {
   try {
-    const { content, platform, response, metadata } = req.body;
+    const { content, response, metadata, categoryName } = req.body;
     const userId = req.user?.id;
 
     if (!userId) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    if (!content || !platform) {
-      return res.status(400).json({ error: 'Content and platform are required' });
+    if (!content || !categoryName) {
+      return res.status(400).json({ error: 'Content and category name are required' });
     }
 
-    const query = await createQuery({ content, platform, response, metadata }, userId);
+    const query = await createQuery({ content, response, metadata, categoryName }, userId);
     return res.status(201).json({ message: 'Query created successfully', query });
   } catch (error) {
     if (error instanceof Error) {
@@ -40,7 +40,9 @@ export const getQueriesHandler = async (req: Request, res: Response) => {
   }
 };
 
-export const getQueryByIdHandler = async (req: Request, res: Response) => {
+
+
+export const getById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const userId = req.user?.id;
@@ -50,18 +52,12 @@ export const getQueryByIdHandler = async (req: Request, res: Response) => {
     }
 
     const query = await getQueryById(id, userId);
-    return res.json({ query });
+    res.json(query);
   } catch (error) {
-    if (error instanceof Error) {
-      if (error.message === 'Query not found') {
-        return res.status(404).json({ error: error.message });
-      } else if (error.message === 'Unauthorized access to query') {
-        return res.status(403).json({ error: error.message });
-      } else {
-        return res.status(500).json({ error: 'Failed to fetch query' });
-      }
+    if (error instanceof Error && error.message === 'Query not found') {
+      res.status(404).json({ error: error.message });
     } else {
-      return res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({ error: 'Failed to fetch query' });
     }
   }
 };

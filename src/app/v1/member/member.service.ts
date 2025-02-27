@@ -1,33 +1,36 @@
-import { prisma } from '../../utils/prisma';
-import { UserRole } from '@prisma/client';
+import { prisma } from '../../../utils/prisma';
 
-export const createMember = async (
-  name: string,
-  categoryName: string,
-  //role: UserRole = UserRole.Employee // Default role is Employee
-) => {
+interface CreateMemberInput {
+  name: string;
+  categoryName: string;
+}
+
+export const createMember = async (input: CreateMemberInput) => {
   try {
-    // Find the category by name
+    const { name, categoryName } = input;
+
+    // Check if category exists
     const category = await prisma.category.findUnique({
       where: { name: categoryName }
     });
 
     if (!category) {
-      throw new Error(`Category "${categoryName}" not found`);
+      throw new Error('Category not found');
     }
 
-    // Create the member with the category
+    // Create user with category relation
     const member = await prisma.user.create({
       data: {
         name,
-        //role,
-        categoryIds: [category.id],
+        categories: {
+          connect: [{ id: category.id }]
+        },
         // Generate a temporary email until actual auth is set up
         email: `${name.toLowerCase().replace(/\s+/g, '.')}_${Date.now()}@temp.com`,
         supabaseId: `temp_${Date.now()}` // Temporary ID until actual auth is set up
       },
       include: {
-        categories: true
+        categories: true // Include the categories in the response
       }
     });
 

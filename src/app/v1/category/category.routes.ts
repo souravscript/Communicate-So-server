@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { create, getAll, getById } from './category.controller';
-import { isAuthenticated } from '../../middlewares/authValidate';
-import { isAdmin } from '../../middlewares/adminCheck';
+import { isAuthenticated } from '../../../middlewares/authValidate';
+import { isAdmin } from '../../../middlewares/adminCheck';
 
 const router = Router();
 

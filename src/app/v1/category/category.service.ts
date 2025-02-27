@@ -1,4 +1,4 @@
-import { prisma } from '../../utils/prisma';
+import { prisma } from '../../../utils/prisma';
 
 export const createCategory = async (categoryName: string) => {
   try {
@@ -17,6 +17,8 @@ export const createCategory = async (categoryName: string) => {
         name: categoryName,
       }
     });
+
+    console.log('Created category:', category); 
 
     return category;
   } catch (error) {

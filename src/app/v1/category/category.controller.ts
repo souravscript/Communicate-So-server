@@ -5,6 +5,8 @@ export const create = async (req: Request, res: Response) => {
   try {
     const { categoryName } = req.body;
 
+    console.log('Creating category:', categoryName);
+
     if (!categoryName) {
       res.status(400).json({ error: 'Category name is required' });
       return;
@@ -24,7 +26,7 @@ export const create = async (req: Request, res: Response) => {
 export const getAll = async (req: Request, res: Response) => {
   try {
     const categories = await getAllCategories();
-    res.json({ categories });
+    res.json( categories );
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch categories' });
   }

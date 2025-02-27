@@ -1,6 +1,6 @@
 import { UserRole, AuthType } from '@prisma/client';
-import { supabase } from '../../utils/supabase';
-import { prisma } from '../../utils/prisma';
+import { supabase } from '../../../utils/supabase';
+import { prisma } from '../../../utils/prisma';
 import { Response } from 'express';
 
 export const signupUser = async (email: string, password: string, fullName: string) => {
@@ -90,19 +90,17 @@ export const signinUser = async (email: string, password: string, res: Response)
     // Set Cookies
     const accessTokenOptions = {
       httpOnly: false,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'none' as const,
+      secure: false,  // Set to false for localhost
+      sameSite: 'lax' as const,  // Changed to lax for local development
       path: '/',
-      domain: 'localhost',
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     };
 
     const refreshTokenOptions = {
       httpOnly: false,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'none' as const,
+      secure: false,  // Set to false for localhost
+      sameSite: 'lax' as const,  // Changed to lax for local development
       path: '/',
-      domain: 'localhost',
       maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
     };
 

@@ -34,7 +34,7 @@
     "multer": "^1.4.5-lts.1",
     "uuid": "^11.1.0",
     "winston": "^3.13.0",
-    "zod": "^3.22.4"
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "@types/cookie": "^0.6.0",
@@ -54,5 +54,8 @@
     "prisma": "^6.4.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
   }
 }

@@ -1,6 +1,6 @@
 import express from 'express';
-import { createQueryHandler, getQueriesHandler, getQueryByIdHandler, getThisWeekStatsHandler } from './queries.controller';
-import { isAuthenticated } from '../../middlewares/authValidate';
+import { createQueryHandler, getQueriesHandler, getById, getThisWeekStatsHandler } from './queries.controller';
+import { isAuthenticated } from '../../../middlewares/authValidate';
 
 const router = express.Router();
 
@@ -17,6 +17,6 @@ router.get('/', getQueriesHandler);
 router.get('/stats/week', getThisWeekStatsHandler);
 
 // Get a specific query by ID
-router.get('/:id', getQueryByIdHandler);
+router.get('/:id', getById);
 
 export default router;
