@@ -14,18 +14,18 @@ generator client {
 }
 
 model User {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  email       String   @unique
-  supabaseId  String   @unique
-  authType    AuthType?
-  role        UserRole?
-  categories  Category[] @relation(fields: [categoryIds], references: [id])
-  categoryIds String[] @db.ObjectId
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                String     @id @default(auto()) @map("_id") @db.ObjectId
+  name              String
+  email             String     @unique
+  supabaseId        String     @unique
+  authType          AuthType?
+  role              UserRole?
+  categories        Category[] @relation(fields: [categoryIds], references: [id])
+  categoryIds       String[]   @db.ObjectId
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
   uploadedResources Resource[] @relation("ResourceUploader")
-  queries     Query[]  // Relation to queries they've created
+  queries           Query[] // Relation to queries they've created
 }
 
 enum AuthType {
@@ -41,41 +41,41 @@ enum UserRole {
 }
 
 model Category {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  name        String   @unique
-  users       User[]   @relation(fields: [userIds], references: [id])
-  userIds     String[] @db.ObjectId
-  queries     Query[]  // Relation to queries made in this category
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  categoryName String   @default("")
+  users        User[]   @relation(fields: [userIds], references: [id])
+  userIds      String[] @db.ObjectId
+  queries      Query[] // Relation to queries made in this category
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model Resource {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
   title       String
   type        ResourceType
   url         String
   accessLevel AccessLevel
-  uploadedBy  String   @db.ObjectId
-  createdAt   DateTime @default(now())
+  uploadedBy  String       @db.ObjectId
+  createdAt   DateTime     @default(now())
 
-  uploader    User     @relation(fields: [uploadedBy], references: [id], name: "ResourceUploader")
+  uploader User @relation(fields: [uploadedBy], references: [id], name: "ResourceUploader")
   //sharedWith  ResourceShared[]
   //company     Company  @relation(fields: [companyId], references: [id], name: "CompanyResources")
 }
 
 model Query {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  content     String   // The actual query text
-  response    String?  // Optional AI response
-  platform    String?  // Platform where the query was made
-  metadata    Json?    // Additional metadata about the query
-  createdBy   String   @db.ObjectId
-  categoryId  String   @db.ObjectId  // Reference to the category
-  user        User     @relation(fields: [createdBy], references: [id])
-  category    Category @relation(fields: [categoryId], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  content    String // The actual query text
+  response   String? // Optional AI response
+  platform   String? // Platform where the query was made
+  metadata   Json? // Additional metadata about the query
+  createdBy  String   @db.ObjectId
+  categoryId String   @db.ObjectId // Reference to the category
+  user       User     @relation(fields: [createdBy], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 enum ResourceType {
@@ -92,11 +92,11 @@ enum AccessLevel {
 }
 
 model DataSource {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  name        String   @unique
-  isEnabled   Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String   @unique
+  isEnabled Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // model Company {
@@ -122,7 +122,7 @@ model DataSource {
 //   id         String   @id @default(auto()) @map("_id") @db.ObjectId
 //   resourceId String   @db.ObjectId
 //   userId     String   @db.ObjectId
-  
+
 //   //resource   Resource @relation(fields: [resourceId], references: [id])
 //   user       User     @relation(fields: [userId], references: [id])
 // }

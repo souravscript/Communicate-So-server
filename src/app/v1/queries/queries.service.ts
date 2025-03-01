@@ -17,7 +17,7 @@ export const createQuery = async (input: CreateQueryInput, userId: string) => {
   try {
     const category = await prisma.category.findFirst({
       where: {
-        name: input.categoryName,
+        categoryName: input.categoryName,
         userIds: {
           has: userId
         }
@@ -40,7 +40,7 @@ export const createQuery = async (input: CreateQueryInput, userId: string) => {
         category: {
           select: {
             id: true,
-            name: true
+            categoryName: true
           }
         }
       }
@@ -63,7 +63,7 @@ export const getQueries = async (userId: string) => {
         category: {
           select: {
             id: true,
-            name: true
+            categoryName: true
           }
         }
       },
@@ -88,7 +88,7 @@ export const getQueryById = async (queryId: string, userId: string) => {
         category: {
           select: {
             id: true,
-            name: true
+            categoryName: true
           }
         }
       }
@@ -123,7 +123,7 @@ export const getThisWeekStats = async (userId: string): Promise<QueryStats> => {
       include: {
         category: {
           select: {
-            name: true
+            categoryName: true
           }
         }
       }
@@ -136,7 +136,7 @@ export const getThisWeekStats = async (userId: string): Promise<QueryStats> => {
       const contentKey = query.content.substring(0, 50);
       byContent[contentKey] = (byContent[contentKey] || 0) + 1;
 
-      const categoryName = query.category.name;
+      const categoryName = query.category.categoryName;
       byCategory[categoryName] = (byCategory[categoryName] || 0) + 1;
     });
 

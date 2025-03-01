@@ -70,3 +70,27 @@ export const updateDataSourceStatus = async (id: string, isEnabled: boolean) => 
     throw error;
   }
 };
+
+export const getLastFiveEnabledDataSources = async () => {
+  try {
+    return await prisma.dataSource.findMany({
+      where: {
+        isEnabled: true
+      },
+      orderBy: {
+        updatedAt: 'desc'
+      },
+      take: 5,
+      select: {
+        id: true,
+        name: true,
+        isEnabled: true,
+        updatedAt: true,
+        createdAt: true
+      }
+    });
+  } catch (error) {
+    console.error('Error in getLastFiveEnabledDataSources:', error);
+    throw error;
+  }
+};

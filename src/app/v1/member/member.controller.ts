@@ -21,12 +21,20 @@ export const create = async (req: Request, res: Response) => {
   }
 };
 
-export const getAll = async (req: Request, res: Response) => {
+export const getAll = async (_req: Request, res: Response) => {
   try {
     const members = await getAllMembers();
-    res.json(members);
+    res.json({
+      success: true,
+      data: members
+    });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch members' });
+    console.error('Error in getAll controller:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Failed to fetch members',
+      message: error instanceof Error ? error.message : 'Unknown error occurred'
+    });
   }
 };
 

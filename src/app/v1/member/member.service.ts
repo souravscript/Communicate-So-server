@@ -10,8 +10,8 @@ export const createMember = async (input: CreateMemberInput) => {
     const { name, categoryName } = input;
 
     // Check if category exists
-    const category = await prisma.category.findUnique({
-      where: { name: categoryName }
+    const category = await prisma.category.findFirst({
+      where: { categoryName: categoryName }
     });
 
     if (!category) {
@@ -25,12 +25,11 @@ export const createMember = async (input: CreateMemberInput) => {
         categories: {
           connect: [{ id: category.id }]
         },
-        // Generate a temporary email until actual auth is set up
         email: `${name.toLowerCase().replace(/\s+/g, '.')}_${Date.now()}@temp.com`,
-        supabaseId: `temp_${Date.now()}` // Temporary ID until actual auth is set up
+        supabaseId: `temp_${Date.now()}`
       },
       include: {
-        categories: true // Include the categories in the response
+        categories: true
       }
     });
 
@@ -43,11 +42,45 @@ export const createMember = async (input: CreateMemberInput) => {
 
 export const getAllMembers = async () => {
   try {
-    return await prisma.user.findMany({
-      include: {
-        categories: true
+    // Get all users with basic info
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        supabaseId: true,
+        authType: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true
+      },
+      orderBy: {
+        createdAt: 'desc'
       }
     });
+
+    // Get categories for each user
+    const usersWithCategories = await Promise.all(
+      users.map(async (user) => {
+        const categories = await prisma.category.findMany({
+          where: {
+            userIds: {
+              has: user.id
+            }
+          },
+          select: {
+            id: true,
+            categoryName: true
+          }
+        });
+        return {
+          ...user,
+          categories
+        };
+      })
+    );
+
+    return usersWithCategories;
   } catch (error) {
     console.error('Error in getAllMembers:', error);
     throw error;

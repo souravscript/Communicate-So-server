@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { createDataSource, getAllDataSources, getDataSourceById, updateDataSourceStatus } from './data-sources.service';
+import { createDataSource, getAllDataSources, getDataSourceById, updateDataSourceStatus, getLastFiveEnabledDataSources } from './data-sources.service';
 
 export const create = async (req: Request, res: Response) => {
   try {
@@ -60,5 +60,14 @@ export const updateStatus = async (req: Request, res: Response) => {
     } else {
       res.status(500).json({ error: 'Failed to update data source status' });
     }
+  }
+};
+
+export const getLastFiveEnabled = async (_req: Request, res: Response) => {
+  try {
+    const dataSources = await getLastFiveEnabledDataSources();
+    res.json(dataSources);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch recent enabled data sources' });
   }
 };

@@ -12,7 +12,7 @@ export const create = async (req: Request, res: Response) => {
       return;
     }
 
-    const category = await createCategory(categoryName);
+    const category = await createCategory( categoryName );
     res.status(201).json({ message: 'Category created successfully', category });
   } catch (error) {
     if (error instanceof Error) {
