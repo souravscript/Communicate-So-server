@@ -20,12 +20,15 @@ model User {
   supabaseId        String     @unique
   authType          AuthType?
   role              UserRole?
+  lastLogin         DateTime?
   categories        Category[] @relation(fields: [categoryIds], references: [id])
   categoryIds       String[]   @db.ObjectId
   createdAt         DateTime   @default(now())
   updatedAt         DateTime   @updatedAt
   uploadedResources Resource[] @relation("ResourceUploader")
-  queries           Query[] // Relation to queries they've created
+  queries           Query[]    // Relation to queries they've created
+  company           Company?   @relation("CompanyToUser", fields: [companyId], references: [id])
+  companyId         String?    @db.ObjectId
 }
 
 enum AuthType {
@@ -57,11 +60,11 @@ model Resource {
   url         String
   accessLevel AccessLevel
   uploadedBy  String       @db.ObjectId
+  companyId   String?      @db.ObjectId
   createdAt   DateTime     @default(now())
 
-  uploader User @relation(fields: [uploadedBy], references: [id], name: "ResourceUploader")
-  //sharedWith  ResourceShared[]
-  //company     Company  @relation(fields: [companyId], references: [id], name: "CompanyResources")
+  uploader User    @relation(fields: [uploadedBy], references: [id], name: "ResourceUploader")
+  company  Company? @relation("CompanyResources", fields: [companyId], references: [id])
 }
 
 model Query {
@@ -99,15 +102,19 @@ model DataSource {
   updatedAt DateTime @updatedAt
 }
 
-// model Company {
-//   id         String   @id @default(auto()) @map("_id") @db.ObjectId
-//   name       String
-//   domain     String   @unique
-//   verified   Boolean  @default(false)
-//   users      User[]   @relation("CompanyToUser")
-//   createdAt  DateTime @default(now())
-//   resources  Resource[] @relation("CompanyResources")
-// }
+model Company {
+  id                    String   @id @default(auto()) @map("_id") @db.ObjectId
+  name                  String
+  website               String?
+  domain               String?   @unique
+  verified             Boolean  @default(false)
+  cloudProvider        String?
+  preferredRegion      String?
+  preferredIntegration String?
+  users                User[]   @relation("CompanyToUser")
+  createdAt            DateTime @default(now())
+  resources            Resource[] @relation("CompanyResources")
+}
 
 // model UserCategory {
 //   id         String   @id @default(auto()) @map("_id") @db.ObjectId

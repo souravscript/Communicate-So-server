@@ -18,9 +18,9 @@ export const createQuery = async (input: CreateQueryInput, userId: string) => {
     const category = await prisma.category.findFirst({
       where: {
         categoryName: input.categoryName,
-        userIds: {
-          has: userId
-        }
+        // userIds: {
+        //   has: userId
+        // }
       }
     });
 
@@ -147,6 +147,31 @@ export const getThisWeekStats = async (userId: string): Promise<QueryStats> => {
     };
   } catch (error) {
     console.error('Error in getThisWeekStats:', error);
+    throw error;
+  }
+};
+
+export const getRecentQueries = async () => {
+  try {
+    const recentQueries = await prisma.query.findMany({
+
+      orderBy: {
+        createdAt: 'desc'
+      },
+      take: 5,
+      include: {
+        category: {
+          select: {
+            id: true,
+            categoryName: true
+          }
+        }
+      }
+    });
+
+    return recentQueries;
+  } catch (error) {
+    console.error('Error in getRecentQueries:', error);
     throw error;
   }
 };

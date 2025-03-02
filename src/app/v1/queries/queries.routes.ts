@@ -1,5 +1,5 @@
 import express from 'express';
-import { createQueryHandler, getQueriesHandler, getById, getThisWeekStatsHandler } from './queries.controller';
+import { createQueryHandler, getQueriesHandler, getById, getThisWeekStatsHandler, getRecentQueriesHandler } from './queries.controller';
 import { isAuthenticated } from '../../../middlewares/authValidate';
 
 const router = express.Router();
@@ -17,6 +17,9 @@ router.get('/', getQueriesHandler);
 router.get('/stats/week', getThisWeekStatsHandler);
 
 // Get a specific query by ID
-router.get('/:id', getById);
+//router.get('/:id', getById);
+
+// Get recent queries
+router.get('/recent', getRecentQueriesHandler);
 
 export default router;

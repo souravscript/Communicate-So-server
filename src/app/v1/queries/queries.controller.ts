@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { createQuery, getQueries, getQueryById, getThisWeekStats } from './queries.service';
+import { createQuery, getQueries, getQueryById, getThisWeekStats, getRecentQueries } from './queries.service';
 
 export const createQueryHandler = async (req: Request, res: Response) => {
   try {
@@ -59,6 +59,17 @@ export const getById = async (req: Request, res: Response) => {
     } else {
       res.status(500).json({ error: 'Failed to fetch query' });
     }
+  }
+};
+
+export const getRecentQueriesHandler = async (req: Request, res: Response) => {
+  try {
+    
+
+    const queries = await getRecentQueries();
+    return res.json({ queries });
+  } catch (error) {
+    return res.status(500).json({ error: 'Failed to fetch recent queries' });
   }
 };
 

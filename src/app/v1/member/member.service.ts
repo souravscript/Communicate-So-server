@@ -2,13 +2,20 @@ import { prisma } from '../../../utils/prisma';
 
 interface CreateMemberInput {
   name: string;
+  email: string;
   categoryName: string;
 }
 
 export const createMember = async (input: CreateMemberInput) => {
   try {
-    const { name, categoryName } = input;
+    const { name, email, categoryName } = input;
 
+    const existingMember=await prisma.user.findUnique({
+      where: { email: email }
+    } )
+    if(existingMember){
+      throw new Error('Member with this email already exists');
+    }
     // Check if category exists
     const category = await prisma.category.findFirst({
       where: { categoryName: categoryName }
@@ -26,7 +33,8 @@ export const createMember = async (input: CreateMemberInput) => {
           connect: [{ id: category.id }]
         },
         email: `${name.toLowerCase().replace(/\s+/g, '.')}_${Date.now()}@temp.com`,
-        supabaseId: `temp_${Date.now()}`
+        supabaseId: `temp_${Date.now()}`,
+        lastLogin: new Date()
       },
       include: {
         categories: true
@@ -103,6 +111,32 @@ export const getMemberById = async (id: string) => {
     return member;
   } catch (error) {
     console.error('Error in getMemberById:', error);
+    throw error;
+  }
+};
+
+export const deleteMember = async (id: string) => {
+  try {
+    // Check if member exists
+    const existingMember = await prisma.user.findUnique({
+      where: { id }
+    });
+
+    if (!existingMember) {
+      throw new Error('Member not found');
+    }
+
+    // Delete the member
+    const deletedMember = await prisma.user.delete({
+      where: { id },
+      include: {
+        categories: true
+      }
+    });
+
+    return deletedMember;
+  } catch (error) {
+    console.error('Error in deleteMember:', error);
     throw error;
   }
 };
